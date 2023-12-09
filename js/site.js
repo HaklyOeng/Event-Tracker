@@ -233,7 +233,7 @@ function calculatingStats(events) {
 
     let stat = {
         sum, average, min, max
-        // the smae as
+        // the same as
         // sum: sum,
         // average: average,
         // min: min,

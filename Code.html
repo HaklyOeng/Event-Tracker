@@ -29,7 +29,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="index.html">
-                <img src="/img/Logo to use/light_initial.svg" height="35" />
+                <img src="/img/Logo/White_Logo.svg" height="35" />
                 Little Quack
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -76,19 +76,220 @@
             <div class="col-12 col-lg-8">
                 <pre class="line-numbers">
                     <code class="language-js">
-function displayMessage() {
-    // get the text out of our input and assign it to a variable 
-    let msg = document.getElementById('message').value;
+                        const events = [
+                        {
+                            event: "ComicCon",
+                            city: "New York",
+                            state: "New York",
+                            attendance: 240000,
+                            date: "06/01/2017",
+                        },
+                        {
+                            event: "ComicCon",
+                            city: "New York",
+                            state: "New York",
+                            attendance: 250000,
+                            date: "06/01/2018",
+                        },
+                        {
+                            event: "ComicCon",
+                            city: "New York",
+                            state: "New York",
+                            attendance: 257000,
+                            date: "06/01/2019",
+                        },
+                        {
+                            event: "ComicCon",
+                            city: "San Diego",
+                            state: "California",
+                            attendance: 130000,
+                            date: "06/01/2017",
+                        },
+                        {
+                            event: "ComicCon",
+                            city: "San Diego",
+                            state: "California",
+                            attendance: 140000,
+                            date: "06/01/2018",
+                        },
+                        {
+                            event: "ComicCon",
+                            city: "San Diego",
+                            state: "California",
+                            attendance: 150000,
+                            date: "06/01/2019",
+                        },
+                        {
+                            event: "HeroesCon",
+                            city: "Charlotte",
+                            state: "North Carolina",
+                            attendance: 40000,
+                            date: "06/01/2017",
+                        },
+                        {
+                            event: "HeroesCon",
+                            city: "Charlotte",
+                            state: "North Carolina",
+                            attendance: 45000,
+                            date: "06/01/2018",
+                        },
+                        {
+                            event: "HeroesCon",
+                            city: "Charlotte",
+                            state: "North Carolina",
+                            attendance: 50000,
+                            date: "06/01/2019",
+                        },
+                    ];
+                    
+                    function buildDropDown() {
+                        
+                        let currentEvents = getEvents();
+                        let eventCities = currentEvents.map(event => event.city) // return a specific part of the array
+                        let uniqueCities = new Set(eventCities); // new Set() - only store unique value no repeat
+                        let dropDownChoices = ['All', ...uniqueCities]; // [... ] turning set into an array
+                    
+                        const dropdownTemplate = document.getElementById('dropdown-item-template');
+                        const dropdownMenu = document.getElementById('city-dropdown');
+                        dropdownMenu.innerHTML ='';
+                        for (let i = 0; i < dropDownChoices.length; i++) {
+                            let cityName = dropDownChoices[i];
+                            let dropdownItem = dropdownTemplate.content.cloneNode(true);                            
+                            dropdownMenu.appendChild(dropdownItem);
+                        }
+                        displayEvents(currentEvents);
+                        displaystats(currentEvents);   
+                        document.getElementById('stats-location').textContent = 'All' ;
+                    
+                    }
+                    
+                    function getEvents() {
+                        let eventsJson = localStorage.getItem('ho-events');
+                    
+                        let storedEvents = events;
+                    
+                        if (eventsJson == null) {
+                            saveEvents(events);
+                        } else {
+                            storedEvents = JSON.parse(eventsJson);
+                        }
+                        
+                        
+                        return storedEvents;
+                    }
+                    
+                    function saveEvents(events) {
+                    
+                        let eventsJson = JSON.stringify(events);
+                        localStorage.setItem('ho-events', eventsJson);
+                    }
+                    
+                    function displayEvents(events) {
+                    
+                        const eventTable = document.getElementById('events-table');
+                  
+                        eventTable.innerHTML = '';
+                        for (let i = 0; i < events.length; i++) {
+                            let event = events[i];                    
+                            let eventRow = document.createElement('tr');
+                            let eventName = document.createElement('td');
+                            eventName.innerText = event.event;
+                            eventRow.appendChild(eventName);
+                    
+                            let eventCity = document.createElement('td');
+                            eventCity.innerText = event.city;
+                            eventRow.appendChild(eventCity);
+                    
+                            let eventState = document.createElement('td');
+                            eventState.innerText = event.state;
+                            eventRow.appendChild(eventState);
+                    
+                            let eventAttendance = document.createElement('td');
+                            eventAttendance.innerText = event.attendance.toLocaleString();
+                            eventRow.appendChild(eventAttendance);
+                    
+                            let eventDate = document.createElement('td');
+                            let date = new Date(event.date);
+                            eventDate.innerText = date.toLocaleDateString();
+                            eventRow.appendChild(eventDate);
+                    
+                            //  - append te row to the <tbody>
+                            eventTable.appendChild(eventRow);
+                        }
+                    }    
 
-    Swal.fire(
-        {
-            backdrop: false,
-            title: 'Little Quack',
-            text: msg,  // <-- replace this text with that variable
-         }
-    );    
-}
-                    </code>
+                    function calculatingStats(events) {
+                        let sum = 0; //create a base variable
+                        let min = events[0].attendance;
+                        let max = 0;
+                    
+                        for (let i = 0; i < events.length; i++) {
+                            let event = events[i];
+                    
+                            sum += event.attendance;
+                    
+                            if (event.attendance < min) {
+                                min = event.attendance;
+                            }
+                    
+                            if (event.attendance > max) {
+                                max = event.attendance;
+                            }
+                    
+                        }
+                        let average = sum / events.length;
+                    
+                        let stat = {
+                            sum, average, min, max                           
+                        }
+                        return stat;
+                    }
+                    
+                    function displaystats(events) {
+                        let stats = calculatingStats(events);
+                        document.getElementById('total-attendance').textContent = stats.sum.toLocaleString();
+                        document.getElementById('average-attendance').textContent = Math.round(stats.average).toLocaleString();
+                        document.getElementById('max-attended').textContent = stats.max.toLocaleString();
+                        document.getElementById('min-attended').textContent = stats.min.toLocaleString();
+                    
+                    }
+                    
+                    function filterByCity(element) {
+                    
+                        let cityName = element.textContent;
+                        document.getElementById('stats-location').textContent = cityName;
+                        let allEvents = getEvents();
+                        let filteredEvents = [];
+                        for (let i = 0; i < allEvents.length; i++) {
+                            let event = allEvents[i];
+                    
+                            if (event.city == cityName || cityName == 'All') {
+                                filteredEvents.push(event);
+                            }
+                        }                        
+                        displaystats(filteredEvents);
+                        displayEvents(filteredEvents);
+                    
+                    }
+                    
+                    function saveNewEvent() {
+                        
+                        let newEventForm = document.getElementById('newEventForm');
+                        let formData = new FormData(newEventForm);
+                        let newEvent = Object.fromEntries(formData.entries());  
+                        newEvent.attendance = parseInt(newEvent.attendance);
+                        newEvent.date = new Date (newEvent.date).toLocaleDateString();
+                        let allEvents = getEvents();
+                        allEvents.push(newEvent)
+                        saveEvents(allEvents);
+                        newEventForm.reset();
+                        let modalElement = document.getElementById('addEvent');
+                        let bsModal = bootstrap.Modal.getInstance(modalElement);
+                        bsModal.hide();
+                        buildDropDown();
+                        
+                    }                
+                </code>
                 </pre>
             </div>
             <div class="col-12 col-lg-4">
@@ -109,12 +310,12 @@ function displayMessage() {
                     &copy; 2023 Hakly Oeng
                 </div>
                 <div class="col text-lg-center">
-                    <img src="/img/Logo to use/light_name.png" height="30" />
+                    <img src="/img/Logo/White_Name.svg" height="30" />
                 </div>
                 <div class="col text-lg-end">
-                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                    <a href="https://github.com/HaklyOeng"><i class="bi bi-github"></i></a>
-                    <a href="#"><i class="bi bi-envelope-at"></i></a>
+                    <a href="https://www.linkedin.com/in/hakly-oeng-b9a9722a1/"><i class="bi bi-linkedin"></i></a>
+                    <a href="https://github.com/HaklyOeng/Event-Tracker"><i class="bi bi-github"></i></a>
+                    <a href="mailto:helihaung@gmail.com" target="_blank"><i class="bi bi-envelope-at"></i></a>
                 </div>
             </div>
         </div>
